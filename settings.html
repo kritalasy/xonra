@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings · Xonra</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="images/Frame 18.png">
+    <script src="scripts.js" defer></script>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-container logo-link" aria-label="Xonra home">
+            <img src="images/Frame 18.png" alt="Xonra Logo">
+            <span class="Xonra_topleft">Xonra</span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Open navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="header-actions" id="site-menu">
+            <nav class="navigation" aria-label="Primary">
+                <a href="index.html" class="nav-link">Home</a>
+                <div class="dropdown">
+                    <button class="home-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                         <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="index.html#about">About</a>
+                        <a href="index.html#projects">Projects</a>
+                        <a href="index.html#help">Help</a>
+                    </div>
+                </div>
+                <a href="OurTeam.html" class="nav-link our-team-link">Our Team</a>
+                <a href="news.html" class="nav-link News-link">News</a>
+                <a href="settings.html" class="nav-link settings-gear" aria-label="Settings" aria-current="page">
+                    <i class="fas fa-cog"></i>
+                    <span class="settings-label">Settings</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <section style="padding-top: 120px;">
+        <div class="settings-container">
+            <div class="settings-card">
+                <h2 class="title" style="text-align: left; margin-bottom: 24px;">
+                    <i class="fas fa-cog" style="margin-right: 10px;"></i>Settings
+                </h2>
+                
+                <div class="settings-group">
+                    <h3><i class="fas fa-palette" style="margin-right: 8px;"></i>Theme Gallery</h3>
+                    <div class="theme-gallery" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                        <button class="theme-preset" data-theme="light" style="padding: 16px; border: 2px solid var(--header-border); border-radius: 12px; background: linear-gradient(135deg, #f6f8fc, #ffffff); cursor: pointer;">
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #3a6cf4;"></div>
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #1b2238;"></div>
+                            </div>
+                            <span style="color: #1b2238; font-weight: 600;">Light</span>
+                        </button>
+                        <button class="theme-preset" data-theme="dark" style="padding: 16px; border: 2px solid var(--header-border); border-radius: 12px; background: linear-gradient(135deg, #0f1424, #181f35); cursor: pointer;">
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #8fb2ff;"></div>
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #f4f7ff;"></div>
+                            </div>
+                            <span style="color: #f4f7ff; font-weight: 600;">Dark</span>
+                        </button>
+                        <button class="theme-preset" data-theme="forest" style="padding: 16px; border: 2px solid var(--header-border); border-radius: 12px; background: linear-gradient(135deg, #1a2f1d, #2a4a2e); cursor: pointer;">
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #66bb6a;"></div>
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #e8f5e9;"></div>
+                            </div>
+                            <span style="color: #e8f5e9; font-weight: 600;">Forest</span>
+                        </button>
+                        <button class="theme-preset" data-theme="ocean" style="padding: 16px; border: 2px solid var(--header-border); border-radius: 12px; background: linear-gradient(135deg, #0d2137, #1a3a5c); cursor: pointer;">
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #38bdf8;"></div>
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #e0f2fe;"></div>
+                            </div>
+                            <span style="color: #e0f2fe; font-weight: 600;">Ocean</span>
+                        </button>
+                        <button class="theme-preset" data-theme="sunset" style="padding: 16px; border: 2px solid var(--header-border); border-radius: 12px; background: linear-gradient(135deg, #2d1b2e, #4a2c4e); cursor: pointer;">
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #ff7eb3;"></div>
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #fce4ec;"></div>
+                            </div>
+                            <span style="color: #fce4ec; font-weight: 600;">Sunset</span>
+                        </button>
+                        <button class="theme-preset" data-theme="monochrome" style="padding: 16px; border: 2px solid var(--header-border); border-radius: 12px; background: linear-gradient(135deg, #1a1a1a, #2d2d2d); cursor: pointer;">
+                            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #a0a0a0;"></div>
+                                <div style="width: 20px; height: 20px; border-radius: 4px; background: #f5f5f5;"></div>
+                            </div>
+                            <span style="color: #f5f5f5; font-weight: 600;">Mono</span>
+                        </button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label for="themeSelect">Theme Selector</label>
+                        <select id="themeSelect">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="forest">Forest</option>
+                            <option value="ocean">Ocean</option>
+                            <option value="sunset">Sunset</option>
+                            <option value="monochrome">Monochrome</option>
+                        </select>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 12px;">
+                        Choose from our collection of handcrafted themes. Each theme provides a unique visual experience.
+                    </p>
+                </div>
+                
+                <div class="settings-group">
+                    <h3><i class="fas fa-columns" style="margin-right: 8px;"></i>Layout Options</h3>
+                    <div class="setting-item">
+                        <label for="layoutSelect">Layout Density</label>
+                        <select id="layoutSelect">
+                            <option value="default">Default</option>
+                            <option value="compact">Compact</option>
+                            <option value="spacious">Spacious</option>
+                        </select>
+                    </div>
+                    
+                    <div class="layout-preview">
+                        <div class="layout-preview-item">
+                            <div class="layout-preview-box"></div>
+                            <div class="layout-preview-text"></div>
+                        </div>
+                        <div class="layout-preview-item">
+                            <div class="layout-preview-box"></div>
+                            <div class="layout-preview-text"></div>
+                        </div>
+                        <div class="layout-preview-item">
+                            <div class="layout-preview-box"></div>
+                            <div class="layout-preview-text"></div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 12px;">
+                        Adjust the spacing and density of page elements. Compact saves space, Spacious gives everything room to breathe.
+                    </p>
+                </div>
+                
+                <div class="settings-group">
+                    <h3><i class="fas fa-sliders-h" style="margin-right: 8px;"></i>Customization</h3>
+                    <div class="setting-item">
+                        <label for="cardWidth">Card Width (px)</label>
+                        <input type="range" id="cardWidth" min="280" max="500" value="360" step="10" style="flex: 1; margin: 0 20px;">
+                        <span id="cardWidthValue">360px</span>
+                    </div>
+                    <div class="setting-item">
+                        <label for="sectionSpacing">Section Spacing (px)</label>
+                        <input type="range" id="sectionSpacing" min="60" max="150" value="88" step="4" style="flex: 1; margin: 0 20px;">
+                        <span id="sectionSpacingValue">88px</span>
+                    </div>
+                    <button id="resetCustomization" style="margin-top: 16px; padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        <i class="fas fa-undo"></i> Reset to Defaults
+                    </button>
+                </div>
+                
+                <div class="settings-group">
+                    <h3>About</h3>
+                    <p style="color: var(--text-secondary);">Xonra · version 2.1</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">
+                        Enhanced with multiple themes and layout customization options.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

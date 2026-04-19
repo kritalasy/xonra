@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="News, announcements, and development updates from Xonra.">
+    <meta name="keywords" content="Xonra news, Xonra updates, Roblox game development, Xonra Minigames">
+    <meta name="author" content="Xonra">
+    <title>News - Xonra</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="images/Frame 18.png">
+
+    <script src="scripts.js" defer></script>
+    <style>
+        .news-hero {
+            min-height: auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+            gap: 28px;
+        }
+
+        .news-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .news-kicker i {
+            color: #ffd166;
+        }
+
+        .news-hero h1 {
+            font-size: clamp(2.3rem, 5vw, 4.5rem);
+            line-height: 1;
+            margin-bottom: 18px;
+        }
+
+        .news-hero p {
+            max-width: 58ch;
+            color: rgba(255, 255, 255, 0.84);
+            font-size: 1.05rem;
+        }
+
+        .news-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .news-secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.25s ease, background-color 0.25s ease;
+        }
+
+        .news-secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .news-hero-panel {
+            background: rgba(10, 16, 34, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 24px;
+            padding: 24px;
+            backdrop-filter: blur(14px);
+            align-self: end;
+        }
+
+        .news-hero-panel h2 {
+            font-size: 1.2rem;
+            margin-bottom: 18px;
+        }
+
+        .news-hero-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .news-hero-item {
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .news-hero-item strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+
+        .news-layout {
+            display: grid;
+            gap: 28px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .news-card,
+        .news-panel,
+        .news-cta {
+            background: var(--surface-bg);
+            border-radius: 22px;
+            border: 1px solid var(--header-border);
+            box-shadow: var(--card-shadow);
+        }
+
+        .news-card {
+            padding: 24px;
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .news-card time,
+        .news-card .news-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .news-card h3 {
+            margin-bottom: 12px;
+            font-size: 1.35rem;
+            color: var(--text-primary);
+        }
+
+        .news-card p {
+            color: var(--text-secondary);
+        }
+
+        .news-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .news-tags span {
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(58, 108, 244, 0.1);
+            color: var(--text-secondary);
+            font-size: 0.86rem;
+            font-weight: 600;
+        }
+
+        .news-columns {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+            gap: 24px;
+        }
+
+        .news-panel {
+            padding: 28px;
+        }
+
+        .news-panel h3 {
+            margin-bottom: 14px;
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+
+        .news-panel p {
+            color: var(--text-secondary);
+        }
+
+        .news-list {
+            display: grid;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .news-list-item {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+
+        .news-list-item i {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(58, 108, 244, 0.12);
+            color: var(--accent);
+        }
+
+        .news-list-item strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .news-roadmap {
+            display: grid;
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .news-roadmap-step {
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: var(--dropdown-bg);
+            border: 1px solid var(--header-border);
+        }
+
+        .news-roadmap-step span {
+            display: inline-block;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .news-roadmap-step p {
+            color: var(--text-secondary);
+        }
+
+        .news-cta {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 18px;
+            align-items: center;
+            padding: 28px;
+        }
+
+        .news-cta h3 {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 1.45rem;
+        }
+
+        .news-cta p {
+            color: var(--text-secondary);
+            max-width: 60ch;
+        }
+
+        @media (max-width: 980px) {
+            .news-hero,
+            .news-columns,
+            .news-cta,
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .news-actions {
+                flex-direction: column;
+            }
+
+            .news-secondary-btn,
+            .news-actions .main-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .news-panel,
+            .news-card,
+            .news-cta {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-container logo-link" aria-label="Xonra home">
+            <img src="images/Frame 18.png" alt="Xonra Logo">
+            <span class="Xonra_topleft">Xonra</span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Open navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="header-actions" id="site-menu">
+            <nav class="navigation" aria-label="Primary">
+                <a href="index.html" class="nav-link">Home</a>
+                <div class="dropdown">
+                    <button class="home-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                         <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="index.html#about">About</a>
+                        <a href="index.html#projects">Projects</a>
+                        <a href="index.html#help">Help</a>
+                    </div>
+                </div>
+                <a href="OurTeam.html" class="nav-link our-team-link">Our Team</a>
+                <a href="news.html" class="nav-link News-link" aria-current="page">News</a>
+
+                <a href="settings.html" class="nav-link settings-gear" aria-label="Settings">
+                <i class="fas fa-cog"></i>
+                    <span class="settings-label">Settings</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="main news-hero">
+        <div>
+            <div class="news-kicker">
+                <i class="fas fa-bolt"></i>
+                XONRA NEWSROOM
+            </div>
+            <h1>Updates, launches, and dev notes from the team.</h1>
+            <p>
+                This page is where we share progress about games, website improvements,
+                community announcements, and the bigger ideas we are building next.
+            </p>
+            <div class="news-actions">
+                <a href="#latest" class="main-btn">Read the latest</a>
+                <a href="https://discord.gg/BR9hQTmSU5" target="_blank" rel="noopener noreferrer" class="news-secondary-btn">
+                    <i class="fab fa-discord"></i>
+                    Join our Discord
+                </a>
+            </div>
+        </div>
+
+        <aside class="news-hero-panel" aria-label="News overview">
+            <h2>What you will find here</h2>
+            <div class="news-hero-list">
+                <div class="news-hero-item">
+                    <strong>Release updates</strong>
+                    <span>Launches, public tests, and new builds worth checking out.</span>
+                </div>
+                <div class="news-hero-item">
+                    <strong>Development notes</strong>
+                    <span>Short looks at what the team is polishing, testing, or reworking.</span>
+                </div>
+                <div class="news-hero-item">
+                    <strong>Community posts</strong>
+                    <span>Announcements, feedback requests, and Discord-first updates.</span>
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <section id="latest">
+        <div class="news-layout">
+            <div>
+                <h2 class="title">Latest News</h2>
+                <div class="news-grid">
+                    <article class="news-card">
+                        <time datetime="2026-04-18">
+                            <i class="fas fa-star"></i>
+                            Featured update
+                        </time>
+                        <h3>The new Xonra website is live</h3>
+                        <p>
+                            The site now has a cleaner layout, theme customization, and a dedicated news page
+                            so announcements are easier to find as the team keeps building.
+                        </p>
+                        <div class="news-tags">
+                            <span>Website</span>
+                            <span>Design refresh</span>
+                            <span>Navigation</span>
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-label">
+                            <i class="fas fa-gamepad"></i>
+                            Development
+                        </div>
+                        <h3>Xonra Minigames is shutting down</h3>
+                        <p>
+                           we decided to shut down xonra minigames because of the new roblox update that 
+                           will require game developers to have roblox plus to publish games
+                        </p>
+                        <div class="news-tags">
+                            <span>Roblox</span>
+                            <span>Pre-alpha</span>
+                            <span>Playtesting</span>
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-label">
+                            <i class="fas fa-comments"></i>
+                            Community
+                        </div>
+                        <h3>Feedback is becoming part of the roadmap</h3>
+                        <p>
+                            Community conversations are helping us decide what to improve first, what needs more
+                            polish, and which ideas deserve a proper spotlight in future updates.
+                        </p>
+                        <div class="news-tags">
+                            <span>Discord</span>
+                            <span>Feedback</span>
+                            <span>Roadmap</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="news-columns">
+                <div class="news-panel">
+                    <h3>What we post on this page</h3>
+                    <p>
+                        The goal of this page is to keep players and supporters in the loop without making them
+                        hunt through different parts of the site.
+                    </p>
+                    <div class="news-list">
+                        <div class="news-list-item">
+                            <i class="fas fa-bullhorn"></i>
+                            <div>
+                                <strong>Announcements</strong>
+                                <span>Major releases, website changes, and important community messages.</span>
+                            </div>
+                        </div>
+                        <div class="news-list-item">
+                            <i class="fas fa-wrench"></i>
+                            <div>
+                                <strong>Patch notes and improvements</strong>
+                                <span>Smaller fixes, balancing changes, and quality-of-life updates.</span>
+                            </div>
+                        </div>
+                        <div class="news-list-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <strong>Behind-the-scenes progress</strong>
+                                <span>Short development notes that show what the team is exploring next.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-panel">
+                    <h3>Coming up next</h3>
+                    <p>
+                        These are the kinds of updates this page is ready to highlight as soon as they are ready.
+                    </p>
+                    <div class="news-roadmap">
+                        <div class="news-roadmap-step">
+                            <span>Next post</span>
+                            <p>A new game made by godot engine</p>
+                        </div>
+                        <div class="news-roadmap-step">
+                            <span>After that</span>
+                            <p>upgrading the website with new features.</p>
+                        </div>
+                        <div class="news-roadmap-step">
+                            <span>Ongoing</span>
+                            <p>learning GD script and some main stuff.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="news-cta">
+                <div>
+                    <h3>Want updates as soon as they drop?</h3>
+                    <p>
+                        Join the Xonra Discord to follow announcements, talk with the team, and catch news before it
+                        turns into a full site post.
+                    </p>
+                </div>
+                <a href="https://discord.gg/BR9hQTmSU5" target="_blank" rel="noopener noreferrer" class="discord-btn">
+                    Join our Discord
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "961307179a8746ba8be5f98ffc3e7556"}'></script>
+</body>
+</html>

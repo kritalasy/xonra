@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Meet the Xonra team — the developers and creators behind our games.">
+    <title>Our Team · Xonra</title>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="icon" type="image/x-icon" href="images/Frame 18.png">
+    
+    <script src="scripts.js" defer></script>
+    <style>
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 28px;
+            margin-top: 24px;
+        }
+        
+        .team-member {
+            background: var(--surface-bg);
+            border-radius: 24px;
+            padding: 32px 20px 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--header-border);
+            text-align: center;
+            transition: transform 0.25s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 22px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .discord-tag-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .discord-tag-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(88, 101, 242, 0.3));
+        }
+        
+        .team-member h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+        
+        .member-badge {
+            background: var(--dropdown-bg);
+            color: var(--text-secondary);
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--header-border);
+            margin-top: 6px;
+            transition: background 0.2s;
+        }
+        
+        .member-badge i {
+            color: #5865F2; /* Discord blurple */
+            font-size: 1.1rem;
+        }
+        
+        .team-intro {
+            max-width: 720px;
+            margin: 0 auto 40px;
+            text-align: center;
+        }
+        
+        .team-intro p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .back-link-team {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: auto;
+        }
+        
+        /* compact adjustments */
+        @media (max-width: 640px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .discord-tag-icon {
+                width: 70px;
+                height: 70px;
+            }
+            .team-member h3 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .profile_pic {
+            border-radius: 100%;
+            border: 2px solid var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-container logo-link" aria-label="Xonra home">
+            <img src="images/Frame 18.png" alt="Xonra Logo">
+            <span class="Xonra_topleft">Xonra</span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Open navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="header-actions" id="site-menu">
+            <nav class="navigation" aria-label="Primary">
+                <a href="index.html" class="nav-link">Home</a>
+                <div class="dropdown">
+                    <button class="home-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                         <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="index.html#about">About</a>
+                        <a href="index.html#projects">Projects</a>
+                        <a href="index.html#help">Help</a>
+                    </div>
+                </div>
+                <a href="OurTeam.html" class="nav-link our-team-link" aria-current="page">
+                Our Team
+                </a>
+
+                <a href="news.html" class="nav-link News-link">News</a>
+
+
+                <a href="settings.html" class="nav-link settings-gear" aria-label="Settings">
+                <i class="fas fa-cog"></i>
+                    <span class="settings-label">Settings</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main team section -->
+    <section style="padding-top: 140px; padding-bottom: 100px;">
+        <div class="settings-container" style="max-width: 1300px;">
+            <div class="team-intro">
+                <div class="section-header">
+                    <h2 class="title" style="margin-bottom: 12px;">
+                        <i class="fas fa-users" style="margin-right: 12px; color: var(--accent);"></i>
+                        Meet the Team
+                    </h2>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 1.15rem;">
+                    We're a passionate group of developers and creators building games and experiences.
+                    Each member brings something unique to Xonra.
+                </p>
+            </div>
+
+            <div class="team-grid">
+                
+                <!-- mohamedsamir196 -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="images/team pfp/mohamedsamirms.jpg" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>mohamedsamirms</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @mohamedsamir196
+                    </div>
+                </div>
+            
+
+                 <!-- kritalasy -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="images/team pfp/kritalasy.webp" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>kritalasy</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @kritalasy
+
+                    </div>
+                </div>
+
+
+                <!-- ali25012 -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5520FBFCD3444521B825AE855192292D-Png/150/150/AvatarHeadshot/Webp/noFilter" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>ali24</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @ali25012
+                    </div>
+                </div>
+                
+                <!-- med_acr -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-39FDB5A5664D817C0BD46CF843348462-Png/150/150/AvatarHeadshot/Webp/noFilter" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>med_acr</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @med_acr
+                    </div>
+                </div>
+                
+                <!-- nxmm0 -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="images/team pfp/noname.webp" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>noname</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @nxmm0
+                    </div>
+                </div>
+                
+                <!-- kinsleyso0907 -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="images/team pfp/pokebear.webp" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>pokebear</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @kinsleyso0907
+                    </div>
+                </div>
+                
+                <!-- randomuserlol24879 -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="images/team pfp/randomuserlol.webp" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>randomuser</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @randomuserlol24879
+                    </div>
+
+                </div>
+
+
+                <!-- fdsfdsfsd_00376 -->
+                <div class="team-member">
+                    <div class="discord-tag-icon">
+                        <img src="images/team pfp/fdsfdsfsd_00376.webp" alt="Discord Tag" class="profile_pic">
+                    </div>
+                    <h3>Giovanni2002a</h3>
+                    <div class="member-badge">
+                        <i class="fab fa-discord"></i> @fdsfdsfsd_00376
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            
+            
+            <!-- Additional note / call to action -->
+            <div style="margin-top: 64px; text-align: center; padding: 24px; background: var(--surface-bg); border-radius: 48px; border: 1px solid var(--header-border);">
+                <p style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 12px;">
+                    <i class="fas fa-comments" style="color: var(--accent); margin-right: 8px;"></i>
+                    Want to connect with the team? 
+                </p>
+                <a href="https://discord.gg/BR9hQTmSU5" target="_blank" rel="noopener noreferrer" class="discord-btn" style="display: inline-block; margin-top: 8px;">
+                    <i class="fab fa-discord" style="margin-right: 8px;"></i>Join our Discord
+                </a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
