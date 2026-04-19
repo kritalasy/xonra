@@ -1,3 +1,11 @@
+/*help how do i center a div*/
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 :root {
     --page-bg: #f6f8fc;
     --surface-bg: #ffffff;
