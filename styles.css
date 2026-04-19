@@ -862,3 +862,14 @@ section {
         font-size: 2.4rem;
     }
 }
+
+
+.github-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: 10px;
+}
