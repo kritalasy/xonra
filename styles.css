@@ -196,7 +196,7 @@ header {
     left: 0;
     z-index: 1000;
     width: 100%;
-    min-height: 88px;
+    min-height: 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -221,7 +221,9 @@ header {
 .logo-container img {
     width: 80px;
     height: 80px;
-    border-radius: 50%;
+    border-radius: 0px;
+    object-fit: cover;
+    transition: all 0.3s ease;
 }
 
 .logo-container span {
@@ -845,9 +847,29 @@ section {
     }
 }
 
+@media (max-width: 640px) {
+    .logo-container img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .logo-container span {
+        font-size: 1.2rem;
+    }
+}
+
 @media (max-width: 420px) {
     .logo-container {
         justify-content: center;
+    }
+
+    .logo-container img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .logo-container span {
+        font-size: 1rem;
     }
 
     .header-actions {

@@ -11,6 +11,27 @@ const layouts = ['default', 'compact', 'spacious'];
 function setTheme(theme) {
     document.body.dataset.theme = theme;
 
+    // Update logo images based on theme
+    const logoSrc = theme === 'light' ? 'images/Xonra-logo.png' : 'images/Xonra-darkmode.png';
+
+    // Update favicon links
+    const faviconLinks = document.querySelectorAll('link[rel="icon"]');
+    faviconLinks.forEach(link => {
+        link.href = logoSrc;
+    });
+
+    // Update header logo images
+    const logoImages = document.querySelectorAll('img[alt="Xonra Logo"]');
+    logoImages.forEach(img => {
+        img.src = logoSrc;
+    });
+
+    // Update og:image meta tag
+    const ogImageMeta = document.querySelector('meta[property="og:image"]');
+    if (ogImageMeta) {
+        ogImageMeta.content = logoSrc;
+    }
+
     if (themeToggle) {
         const themeNames = {
             'light': 'Light',
@@ -20,7 +41,8 @@ function setTheme(theme) {
             'sunset': 'Sunset',
             'monochrome': 'Mono'
         };
-        const nextTheme = theme === "light" ? "dark" : "light";
+        const currentIndex = themes.indexOf(theme);
+        const nextTheme = themes[(currentIndex + 1) % themes.length];
         themeToggle.textContent = `${themeNames[nextTheme]} mode`;
         themeToggle.setAttribute("aria-label", `Switch to ${themeNames[nextTheme]} mode`);
     }
