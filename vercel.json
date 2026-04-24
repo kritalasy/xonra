@@ -1,20 +1,5 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/publish-scheduled",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "headers": [
-    {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
     {
       "source": "/(.*)",
       "headers": [
