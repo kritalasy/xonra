@@ -14,3 +14,24 @@
     you can check our discord, also linked below.
 </p>
 <a href = https://discord.gg/BR9hQTmSU5/ _blank>discord.gg/sH7WCHdYFp</a>
+
+<h2>Push notifications setup</h2>
+<p>
+    The site now includes a real server-side web push system for Vercel deployments.
+    To make notifications reach all subscribed devices, set these environment variables in Vercel:
+</p>
+<ul>
+    <li><code>KV_REST_API_URL</code></li>
+    <li><code>KV_REST_API_TOKEN</code></li>
+    <li><code>WEB_PUSH_PUBLIC_KEY</code></li>
+    <li><code>WEB_PUSH_PRIVATE_KEY</code></li>
+    <li><code>WEB_PUSH_SUBJECT</code></li>
+    <li><code>XONRA_ADMIN_CODE_HASH</code></li>
+</ul>
+<p>
+    You can generate the push keys and the admin passcode hash with:
+</p>
+<pre><code>node generate-secrets.mjs "your-admin-passcode"</code></pre>
+<p>
+    After those values are added in Vercel, publish notifications from <code>admin.html</code> and they will fan out to every browser/device that subscribed through the site.
+</p>

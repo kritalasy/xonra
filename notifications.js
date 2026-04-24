@@ -1,8 +1,8 @@
 (() => {
-    const FEED_KEY = "xonra-notification-feed";
+    const LOCAL_FEED_KEY = "xonra-notification-feed";
     const PREFS_KEY = "xonra-notification-prefs";
-    const ADMIN_SESSION_KEY = "xonra-admin-session";
-    const ADMIN_CODE_HASH = "fe88422601fcc6f3908c3488a60d63b8a8d8b06bdae3251a9bd4578a9c6cb92a";
+    const ADMIN_HASH_KEY = "xonra-admin-hash";
+    const DEFAULT_ADMIN_HASH = "fe88422601fcc6f3908c3488a60d63b8a8d8b06bdae3251a9bd4578a9c6cb92a";
     const MAX_ITEMS = 60;
     const CHANNELS = [
         { id: "website", label: "Website updates" },
@@ -10,6 +10,42 @@
         { id: "community", label: "Community posts" },
         { id: "events", label: "Events and launches" }
     ];
+    const DEFAULT_FEED = [
+        {
+            id: "seed-website-refresh",
+            title: "Xonra website refresh is live",
+            message: "The site now has a cleaner layout, a news hub, and more room for team updates.",
+            link: "news.html",
+            channel: "website",
+            priority: "high",
+            status: "published",
+            publishedAt: "2026-04-18T10:00:00.000Z",
+            scheduledAt: "",
+            createdAt: "2026-04-18T10:00:00.000Z"
+        },
+        {
+            id: "seed-community-roadmap",
+            title: "Community feedback now shapes the roadmap",
+            message: "Discord feedback is helping the team decide what to improve first and what to build next.",
+            link: "news.html",
+            channel: "community",
+            priority: "normal",
+            status: "published",
+            publishedAt: "2026-04-19T12:00:00.000Z",
+            scheduledAt: "",
+            createdAt: "2026-04-19T12:00:00.000Z"
+        }
+    ];
+
+    const state = {
+        apiAvailable: false,
+        pushConfigured: false,
+        publicKey: null,
+        feed: [],
+        stats: null,
+        adminSession: false,
+        loading: true
+    };
 
     function safeJsonParse(value, fallback) {
         try {
@@ -29,23 +65,6 @@
 
     function uid(prefix) {
         return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
-    }
-
-    async function sha256(value) {
-        const source = new TextEncoder().encode(value);
-        const digest = await crypto.subtle.digest("SHA-256", source);
-        return Array.from(new Uint8Array(digest))
-            .map((byte) => byte.toString(16).padStart(2, "0"))
-            .join("");
-    }
-
-    async function isValidAdminCode(value) {
-        const normalized = String(value || "").trim();
-        if (!normalized || !window.crypto?.subtle) {
-            return false;
-        }
-
-        return (await sha256(normalized)) === ADMIN_CODE_HASH;
     }
 
     function escapeHtml(value) {
@@ -111,77 +130,46 @@
         };
     }
 
+    function seedLocalFeedIfEmpty() {
+        const existing = readStorage(LOCAL_FEED_KEY, []);
+        if (existing.length) return;
+        writeStorage(LOCAL_FEED_KEY, DEFAULT_FEED);
+    }
+
+    function getLocalFeed() {
+        seedLocalFeedIfEmpty();
+        return readStorage(LOCAL_FEED_KEY, DEFAULT_FEED).map(normalizeItem).slice(0, MAX_ITEMS);
+    }
+
+    function saveLocalFeed(items) {
+        writeStorage(LOCAL_FEED_KEY, items.map(normalizeItem).slice(0, MAX_ITEMS));
+    }
+
     function getFeed() {
-        const stored = readStorage(FEED_KEY, []);
-        return stored.map(normalizeItem).slice(0, MAX_ITEMS);
+        return (state.feed.length ? state.feed : getLocalFeed()).slice(0, MAX_ITEMS);
     }
 
-    function saveFeed(items) {
-        writeStorage(FEED_KEY, items.map(normalizeItem).slice(0, MAX_ITEMS));
-    }
-
-    function seedFeedIfEmpty() {
-        const existing = getFeed();
-        if (existing.length) return existing;
-
-        const seeded = [
-            {
-                id: uid("seed"),
-                title: "Xonra website refresh is live",
-                message: "The site now has a cleaner layout, a news hub, and more room for team updates.",
-                link: "news.html",
-                channel: "website",
-                priority: "high",
-                status: "published",
-                publishedAt: "2026-04-18T10:00:00.000Z",
-                createdAt: "2026-04-18T10:00:00.000Z"
-            },
-            {
-                id: uid("seed"),
-                title: "Community feedback now shapes the roadmap",
-                message: "Discord feedback is helping the team decide what to improve first and what to build next.",
-                link: "news.html",
-                channel: "community",
-                priority: "normal",
-                status: "published",
-                publishedAt: "2026-04-19T12:00:00.000Z",
-                createdAt: "2026-04-19T12:00:00.000Z"
-            }
-        ];
-
-        saveFeed(seeded);
-        return getFeed();
-    }
-
-    function flushScheduledNotifications() {
-        const now = Date.now();
-        let changed = false;
-        const nextFeed = getFeed().map((item) => {
-            if (item.status === "scheduled" && item.scheduledAt) {
-                const scheduledAt = new Date(item.scheduledAt).getTime();
-                if (!Number.isNaN(scheduledAt) && scheduledAt <= now) {
-                    changed = true;
-                    return {
-                        ...item,
-                        status: "published",
-                        publishedAt: new Date().toISOString()
-                    };
-                }
-            }
-            return item;
-        });
-
-        if (changed) {
-            saveFeed(nextFeed);
-        }
-
-        return nextFeed;
+    function getStats() {
+        if (state.stats) return state.stats;
+        const feed = getFeed();
+        return {
+            total: feed.length,
+            published: feed.filter((item) => item.status === "published").length,
+            scheduled: feed.filter((item) => item.status === "scheduled").length,
+            drafts: feed.filter((item) => item.status === "draft").length,
+            subscribers: 0
+        };
     }
 
     function getPublishedNotifications() {
-        return flushScheduledNotifications()
+        return getFeed()
             .filter((item) => item.status === "published")
             .sort((left, right) => new Date(right.publishedAt) - new Date(left.publishedAt));
+    }
+
+    function getVisibleNotifications() {
+        const prefs = getPrefs();
+        return getPublishedNotifications().filter((item) => prefs.topics.includes(item.channel));
     }
 
     function getUnreadCount() {
@@ -194,11 +182,6 @@
         return lastSeenIndex === -1 ? notifications.length : lastSeenIndex;
     }
 
-    function getVisibleNotifications() {
-        const prefs = getPrefs();
-        return getPublishedNotifications().filter((item) => prefs.topics.includes(item.channel));
-    }
-
     function markAllSeen() {
         const latest = getVisibleNotifications()[0];
         if (!latest) return;
@@ -209,6 +192,24 @@
         return typeof window !== "undefined" && "Notification" in window;
     }
 
+    async function sha256(value) {
+        const source = new TextEncoder().encode(String(value || "").trim());
+        const digest = await crypto.subtle.digest("SHA-256", source);
+        return Array.from(new Uint8Array(digest))
+            .map((byte) => byte.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    async function requestJson(path, options = {}) {
+        try {
+            const response = await fetch(path, options);
+            const data = await response.json().catch(() => ({}));
+            return { ok: response.ok, status: response.status, data };
+        } catch (error) {
+            return { ok: false, status: 0, data: { error: error.message } };
+        }
+    }
+
     async function registerServiceWorker() {
         if (!("serviceWorker" in navigator)) return null;
         try {
@@ -216,6 +217,86 @@
         } catch (error) {
             return null;
         }
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = "=".repeat((4 - (base64String.length % 4 || 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+    }
+
+    async function getPushSubscription() {
+        if (!("serviceWorker" in navigator)) return null;
+        const registration = await navigator.serviceWorker.ready.catch(() => null);
+        if (!registration || !registration.pushManager) {
+            return null;
+        }
+
+        return registration.pushManager.getSubscription();
+    }
+
+    async function subscribeCurrentDevice(topics = getPrefs().topics) {
+        if (!state.apiAvailable || !state.pushConfigured || !state.publicKey) {
+            return { ok: false, reason: "server-unavailable" };
+        }
+
+        const registration = await navigator.serviceWorker.ready.catch(() => null);
+        if (!registration || !registration.pushManager) {
+            return { ok: false, reason: "push-unsupported" };
+        }
+
+        let subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(state.publicKey)
+            });
+        }
+
+        const response = await requestJson("/api/push/subscribe", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                subscription: subscription.toJSON(),
+                topics,
+                userAgent: navigator.userAgent
+            })
+        });
+
+        if (response.ok) {
+            savePrefs({
+                browserEnabled: true,
+                subscribedAt: new Date().toISOString()
+            });
+        }
+
+        return response;
+    }
+
+    async function unsubscribeCurrentDevice() {
+        const subscription = await getPushSubscription();
+        if (!subscription) return;
+
+        if (state.apiAvailable) {
+            await requestJson("/api/push/unsubscribe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    endpoint: subscription.endpoint
+                })
+            });
+        }
+
+        await subscription.unsubscribe().catch(() => null);
+        savePrefs({
+            browserEnabled: false,
+            subscribedAt: null
+        });
     }
 
     async function requestPermission() {
@@ -229,6 +310,11 @@
             browserEnabled: permission === "granted",
             subscribedAt: permission === "granted" ? new Date().toISOString() : null
         });
+
+        if (permission === "granted") {
+            await subscribeCurrentDevice();
+        }
+
         return permission;
     }
 
@@ -271,73 +357,155 @@
         return showBrowserNotification(latest);
     }
 
-    function publishNotification(values) {
-        const base = {
-            id: values.id || uid("note"),
-            title: values.title.trim(),
-            message: values.message.trim(),
-            link: values.link.trim() || "news.html",
-            channel: values.channel,
-            priority: values.priority,
-            status: values.status,
-            scheduledAt: values.status === "scheduled" ? values.scheduledAt : "",
-            publishedAt: values.status === "published" ? new Date().toISOString() : "",
-            createdAt: values.createdAt || new Date().toISOString()
-        };
-
-        const feed = getFeed();
-        const existingIndex = feed.findIndex((item) => item.id === base.id);
-        if (existingIndex >= 0) {
-            feed[existingIndex] = normalizeItem({ ...feed[existingIndex], ...base });
-        } else {
-            feed.unshift(normalizeItem(base));
+    async function refreshFeed() {
+        if (!state.apiAvailable) {
+            state.feed = getLocalFeed();
+            return state.feed;
         }
 
-        saveFeed(feed);
-        return normalizeItem(base);
+        const response = await requestJson("/api/notifications/feed");
+        if (response.ok && Array.isArray(response.data.feed)) {
+            state.feed = response.data.feed.map(normalizeItem);
+            state.stats = response.data.stats || null;
+            return state.feed;
+        }
+
+        state.feed = getLocalFeed();
+        return state.feed;
     }
 
-    function deleteNotification(id) {
-        saveFeed(getFeed().filter((item) => item.id !== id));
+    function getStoredAdminHash() {
+        return sessionStorage.getItem(ADMIN_HASH_KEY) || "";
     }
 
-    function duplicateNotification(id) {
-        const target = getFeed().find((item) => item.id === id);
-        if (!target) return null;
+    async function verifyAdminSession(adminHash = getStoredAdminHash()) {
+        if (!adminHash) {
+            state.adminSession = false;
+            return false;
+        }
 
-        return publishNotification({
-            ...target,
-            id: uid("note"),
-            status: "draft",
-            scheduledAt: "",
-            publishedAt: "",
-            createdAt: new Date().toISOString()
+        if (!state.apiAvailable) {
+            state.adminSession = adminHash === DEFAULT_ADMIN_HASH;
+            return state.adminSession;
+        }
+
+        const response = await requestJson("/api/admin/session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-hash": adminHash
+            },
+            body: JSON.stringify({ adminHash })
         });
+
+        state.adminSession = response.ok;
+        if (!response.ok) {
+            sessionStorage.removeItem(ADMIN_HASH_KEY);
+        }
+
+        return response.ok;
     }
 
-    function getAdminState() {
-        return sessionStorage.getItem(ADMIN_SESSION_KEY) === "true";
+    async function loginAdmin(passcode) {
+        const adminHash = await sha256(passcode);
+        const isValid = await verifyAdminSession(adminHash);
+        if (isValid) {
+            sessionStorage.setItem(ADMIN_HASH_KEY, adminHash);
+        }
+        return isValid;
     }
 
-    function setAdminState(value) {
-        sessionStorage.setItem(ADMIN_SESSION_KEY, value ? "true" : "false");
+    async function loadAdminFeed() {
+        const adminHash = getStoredAdminHash();
+        if (!adminHash || !state.apiAvailable) {
+            return { ok: false };
+        }
+
+        const response = await requestJson("/api/admin/feed", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-hash": adminHash
+            },
+            body: JSON.stringify({ adminHash })
+        });
+
+        if (response.ok && Array.isArray(response.data.feed)) {
+            state.feed = response.data.feed.map(normalizeItem);
+            state.stats = response.data.stats || null;
+        }
+
+        return response;
     }
 
-    function getStats() {
-        const feed = getFeed();
-        const published = feed.filter((item) => item.status === "published").length;
-        const scheduled = feed.filter((item) => item.status === "scheduled").length;
-        const drafts = feed.filter((item) => item.status === "draft").length;
-        const prefs = getPrefs();
+    async function publishNotification(values) {
+        if (!state.apiAvailable) {
+            const item = normalizeItem({
+                id: values.id || uid("note"),
+                title: values.title.trim(),
+                message: values.message.trim(),
+                link: values.link.trim() || "news.html",
+                channel: values.channel,
+                priority: values.priority,
+                status: values.status,
+                scheduledAt: values.status === "scheduled" ? values.scheduledAt : "",
+                publishedAt: values.status === "published" ? new Date().toISOString() : "",
+                createdAt: values.createdAt || new Date().toISOString()
+            });
+            const feed = getLocalFeed();
+            const existingIndex = feed.findIndex((entry) => entry.id === item.id);
+            if (existingIndex >= 0) {
+                feed[existingIndex] = item;
+            } else {
+                feed.unshift(item);
+            }
+            saveLocalFeed(feed);
+            state.feed = getLocalFeed();
+            return { ok: true, data: { notification: item, delivery: { deliveredCount: 0 } } };
+        }
 
-        return {
-            total: feed.length,
-            published,
-            scheduled,
-            drafts,
-            browserEnabled: prefs.browserEnabled,
-            unread: getUnreadCount()
-        };
+        const adminHash = getStoredAdminHash();
+        const response = await requestJson("/api/admin/publish", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-hash": adminHash
+            },
+            body: JSON.stringify({
+                adminHash,
+                notification: values
+            })
+        });
+
+        if (response.ok) {
+            await loadAdminFeed();
+        }
+
+        return response;
+    }
+
+    async function deleteNotification(id) {
+        if (!state.apiAvailable) {
+            saveLocalFeed(getLocalFeed().filter((item) => item.id !== id));
+            state.feed = getLocalFeed();
+            return { ok: true };
+        }
+
+        const adminHash = getStoredAdminHash();
+        const response = await requestJson("/api/admin/delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-admin-hash": adminHash
+            },
+            body: JSON.stringify({ adminHash, id })
+        });
+
+        if (response.ok) {
+            await loadAdminFeed();
+        }
+
+        return response;
     }
 
     function renderChannelOptions(selected) {
@@ -374,6 +542,8 @@
         const prefs = getPrefs();
         const permission = matchesPermission() ? Notification.permission : "unsupported";
         const visibleNotifications = getVisibleNotifications().slice(0, 4);
+        const stats = getStats();
+        const deviceStatus = prefs.browserEnabled && state.pushConfigured ? "Connected" : prefs.browserEnabled ? "Allowed" : "Disabled";
 
         root.innerHTML = `
             <div class="xr-card-grid">
@@ -384,7 +554,7 @@
                             <h3>Stay in the loop</h3>
                         </div>
                         <span class="xr-status-badge ${prefs.browserEnabled ? "is-live" : ""}">
-                            ${prefs.browserEnabled ? "Enabled" : "Disabled"}
+                            ${escapeHtml(deviceStatus)}
                         </span>
                     </div>
                     <p class="xr-muted">
@@ -392,12 +562,16 @@
                     </p>
                     <div class="xr-actions-row">
                         <button type="button" class="xr-primary-btn" data-action="enable-notifications">
-                            ${permission === "granted" ? "Refresh access" : "Enable browser notifications"}
+                            ${permission === "granted" ? "Reconnect this device" : "Enable browser notifications"}
                         </button>
                         <button type="button" class="xr-secondary-btn" data-action="test-notification">Send test alert</button>
+                        <button type="button" class="xr-text-btn" data-action="disable-notifications">Disconnect device</button>
                     </div>
                     <p class="xr-helper-text">
-                        Browser support: <strong>${escapeHtml(permission)}</strong>
+                        Browser permission: <strong>${escapeHtml(permission)}</strong>
+                    </p>
+                    <p class="xr-helper-text">
+                        Audience reached right now: <strong>${stats.subscribers || 0}</strong> subscribed devices
                     </p>
                 </section>
 
@@ -442,7 +616,13 @@
             const result = await requestPermission();
             if (result === "granted") {
                 await deliverLatestNotification();
+                await refreshFeed();
             }
+            renderAll();
+        });
+
+        root.querySelector('[data-action="disable-notifications"]')?.addEventListener("click", async () => {
+            await unsubscribeCurrentDevice();
             renderAll();
         });
 
@@ -450,7 +630,7 @@
             const item = {
                 id: uid("preview"),
                 title: "Test notification from Xonra",
-                message: "Your browser is ready to receive new updates from the site.",
+                message: "This device is ready to receive site-wide updates.",
                 link: "settings.html",
                 priority: "normal"
             };
@@ -462,7 +642,7 @@
             renderAll();
         });
 
-        root.querySelector(".xr-topics-form")?.addEventListener("submit", (event) => {
+        root.querySelector(".xr-topics-form")?.addEventListener("submit", async (event) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const topics = formData.getAll("topic");
@@ -470,6 +650,11 @@
                 topics: topics.length ? topics : CHANNELS.map((channel) => channel.id),
                 muted: formData.get("muted") === "on"
             });
+
+            if (matchesPermission() && Notification.permission === "granted") {
+                await subscribeCurrentDevice(getPrefs().topics);
+            }
+
             renderAll();
         });
     }
@@ -477,6 +662,7 @@
     function mountNewsPanel(root) {
         const items = getVisibleNotifications().slice(0, 3);
         const unread = getUnreadCount();
+        const stats = getStats();
 
         root.innerHTML = `
             <section class="xr-panel xr-news-panel">
@@ -488,7 +674,7 @@
                     <span class="xr-count-badge">${unread} unread</span>
                 </div>
                 <p class="xr-muted">
-                    These cards update from the shared notification system and mirror what subscribers see first.
+                    These cards mirror the server-side feed. When an admin publishes, it can fan out to all ${stats.subscribers || 0} subscribed devices.
                 </p>
                 <div class="xr-feed-list">
                     ${renderFeedList(items, "No live announcements have been published yet.")}
@@ -510,19 +696,23 @@
     function mountHeroCta(root) {
         const prefs = getPrefs();
         const latest = getVisibleNotifications()[0];
+        const stats = getStats();
 
         root.innerHTML = `
             <div class="xr-banner">
                 <div>
-                    <p class="xr-eyebrow">New system</p>
+                    <p class="xr-eyebrow">Live push system</p>
                     <h3>Turn on Xonra notifications</h3>
                     <p class="xr-muted">
                         ${latest ? escapeHtml(latest.title) : "Get the next launch and community post as soon as it drops."}
                     </p>
+                    <p class="xr-helper-text">
+                        Current reach: ${stats.subscribers || 0} subscribed devices
+                    </p>
                 </div>
                 <div class="xr-actions-row">
                     <button type="button" class="xr-primary-btn" data-action="enable-notifications">
-                        ${prefs.browserEnabled ? "Notifications enabled" : "Enable alerts"}
+                        ${prefs.browserEnabled ? "Reconnect this device" : "Enable alerts"}
                     </button>
                     <a href="settings.html" class="xr-secondary-btn xr-link-btn">Manage preferences</a>
                 </div>
@@ -537,20 +727,25 @@
     }
 
     function mountAdminPanel(root) {
-        if (!getAdminState()) {
+        if (state.loading) {
+            root.innerHTML = `<section class="xr-admin-gate"><div class="xr-panel xr-admin-gate-panel"><h2>Loading admin panel…</h2></div></section>`;
+            return;
+        }
+
+        if (!state.adminSession) {
             root.innerHTML = `
                 <section class="xr-admin-gate">
                     <div class="xr-panel xr-admin-gate-panel">
                         <p class="xr-eyebrow">Admin access</p>
                         <h2>Unlock the Xonra control room</h2>
                         <p class="xr-muted">
-                            This front-end admin panel uses a simple passcode gate for local control.
+                            Admin publishing now runs server-side, so a single publish can reach every subscribed device.
                         </p>
                         <form class="xr-admin-auth-form">
                             <label for="adminCode">Admin code</label>
                             <input id="adminCode" name="adminCode" type="password" class="xr-input" placeholder="Enter admin code" autocomplete="current-password">
                             <button type="submit" class="xr-primary-btn">Enter dashboard</button>
-                            <p class="xr-helper-text">The passcode is no longer shown in the interface.</p>
+                            <p class="xr-helper-text">The passcode is verified on the server and is not shown in the interface.</p>
                         </form>
                     </div>
                 </section>
@@ -559,16 +754,16 @@
             root.querySelector(".xr-admin-auth-form")?.addEventListener("submit", async (event) => {
                 event.preventDefault();
                 const formData = new FormData(event.currentTarget);
-                if (await isValidAdminCode(formData.get("adminCode"))) {
-                    setAdminState(true);
+                const input = root.querySelector("#adminCode");
+                const success = await loginAdmin(formData.get("adminCode"));
+
+                if (success) {
+                    await loadAdminFeed();
                     renderAll();
-                } else {
-                    const input = root.querySelector("#adminCode");
-                    if (input) {
-                        input.setCustomValidity("Incorrect admin code");
-                        input.reportValidity();
-                        setTimeout(() => input.setCustomValidity(""), 1000);
-                    }
+                } else if (input) {
+                    input.setCustomValidity("Incorrect admin code");
+                    input.reportValidity();
+                    setTimeout(() => input.setCustomValidity(""), 1000);
                 }
             });
             return;
@@ -584,10 +779,11 @@
                         <p class="xr-eyebrow">Admin panel</p>
                         <h1>Notification and updates control room</h1>
                         <p class="xr-muted">
-                            Publish new announcements, schedule future drops, and keep the public feed in sync.
+                            Publishing here writes to the shared server-side feed and sends a push to every subscribed device.
                         </p>
                     </div>
                     <div class="xr-actions-row">
+                        <button type="button" class="xr-secondary-btn" data-action="refresh-admin">Refresh</button>
                         <button type="button" class="xr-secondary-btn" data-action="logout-admin">Lock panel</button>
                         <a href="news.html" class="xr-secondary-btn xr-link-btn">View public feed</a>
                     </div>
@@ -609,6 +805,10 @@
                     <article class="xr-stat-card">
                         <span>Drafts</span>
                         <strong>${stats.drafts}</strong>
+                    </article>
+                    <article class="xr-stat-card">
+                        <span>Subscribed devices</span>
+                        <strong>${stats.subscribers || 0}</strong>
                     </article>
                 </div>
 
@@ -669,6 +869,7 @@
                                 <button type="submit" class="xr-primary-btn">Save update</button>
                                 <button type="button" class="xr-secondary-btn" data-action="reset-form">Clear form</button>
                             </div>
+                            <p class="xr-helper-text xr-form-feedback" data-form-feedback></p>
                         </form>
                     </section>
 
@@ -696,7 +897,7 @@
                                     <div class="xr-actions-row">
                                         <button type="button" class="xr-text-btn" data-edit-id="${escapeHtml(item.id)}">Edit</button>
                                         <button type="button" class="xr-text-btn" data-duplicate-id="${escapeHtml(item.id)}">Duplicate</button>
-                                        <button type="button" class="xr-text-btn" data-send-id="${escapeHtml(item.id)}">Notify now</button>
+                                        <button type="button" class="xr-text-btn" data-send-id="${escapeHtml(item.id)}">Send now</button>
                                         <button type="button" class="xr-text-btn is-danger" data-delete-id="${escapeHtml(item.id)}">Delete</button>
                                     </div>
                                 </article>
@@ -708,6 +909,7 @@
         `;
 
         const form = root.querySelector(".xr-admin-form");
+        const feedback = root.querySelector("[data-form-feedback]");
         const statusInput = form?.querySelector('[name="status"]');
         const scheduleInput = form?.querySelector('[name="scheduledAt"]');
 
@@ -725,6 +927,8 @@
 
         form?.addEventListener("submit", async (event) => {
             event.preventDefault();
+            if (feedback) feedback.textContent = "";
+
             const formData = new FormData(form);
             const payload = {
                 id: (formData.get("id") || "").toString().trim(),
@@ -747,23 +951,36 @@
                 return;
             }
 
-            const created = publishNotification(payload);
-            if (created.status === "published") {
-                await showBrowserNotification(created, true);
+            const response = await publishNotification(payload);
+            if (response.ok) {
+                form.reset();
+                syncScheduleAvailability();
+                const deliveredCount = response.data?.delivery?.deliveredCount || 0;
+                if (feedback) {
+                    feedback.textContent = payload.status === "published"
+                        ? `Published successfully. Push fan-out reached ${deliveredCount} subscribed device${deliveredCount === 1 ? "" : "s"}.`
+                        : "Saved successfully.";
+                }
+                renderAll();
+            } else if (feedback) {
+                feedback.textContent = response.data?.error || "Could not save this update.";
             }
-
-            form.reset();
-            syncScheduleAvailability();
-            renderAll();
         });
 
         root.querySelector('[data-action="reset-form"]')?.addEventListener("click", () => {
             form?.reset();
+            if (feedback) feedback.textContent = "";
             syncScheduleAvailability();
         });
 
+        root.querySelector('[data-action="refresh-admin"]')?.addEventListener("click", async () => {
+            await loadAdminFeed();
+            renderAll();
+        });
+
         root.querySelector('[data-action="logout-admin"]')?.addEventListener("click", () => {
-            setAdminState(false);
+            sessionStorage.removeItem(ADMIN_HASH_KEY);
+            state.adminSession = false;
             renderAll();
         });
 
@@ -787,14 +1004,25 @@
 
         root.querySelectorAll("[data-duplicate-id]").forEach((button) => {
             button.addEventListener("click", () => {
-                duplicateNotification(button.dataset.duplicateId);
-                renderAll();
+                const item = getFeed().find((entry) => entry.id === button.dataset.duplicateId);
+                if (!item || !form) return;
+
+                form.querySelector('[name="id"]').value = "";
+                form.querySelector('[name="title"]').value = item.title;
+                form.querySelector('[name="message"]').value = item.message;
+                form.querySelector('[name="link"]').value = item.link;
+                form.querySelector('[name="channel"]').value = item.channel;
+                form.querySelector('[name="priority"]').value = item.priority;
+                form.querySelector('[name="status"]').value = "draft";
+                form.querySelector('[name="scheduledAt"]').value = "";
+                syncScheduleAvailability();
+                form.scrollIntoView({ behavior: "smooth", block: "start" });
             });
         });
 
         root.querySelectorAll("[data-delete-id]").forEach((button) => {
-            button.addEventListener("click", () => {
-                deleteNotification(button.dataset.deleteId);
+            button.addEventListener("click", async () => {
+                await deleteNotification(button.dataset.deleteId);
                 renderAll();
             });
         });
@@ -802,8 +1030,20 @@
         root.querySelectorAll("[data-send-id]").forEach((button) => {
             button.addEventListener("click", async () => {
                 const item = getFeed().find((entry) => entry.id === button.dataset.sendId);
-                if (!item) return;
-                await showBrowserNotification({ ...item, status: "published" }, true);
+                if (!item || !feedback) return;
+
+                const response = await publishNotification({
+                    ...item,
+                    status: "published",
+                    scheduledAt: ""
+                });
+
+                if (response.ok) {
+                    feedback.textContent = `Notification sent to ${response.data?.delivery?.deliveredCount || 0} subscribed device${(response.data?.delivery?.deliveredCount || 0) === 1 ? "" : "s"}.`;
+                    renderAll();
+                } else {
+                    feedback.textContent = response.data?.error || "Could not send this notification.";
+                }
             });
         });
     }
@@ -819,27 +1059,49 @@
     }
 
     function attachGlobalListeners() {
-        window.addEventListener("storage", (event) => {
-            if ([FEED_KEY, PREFS_KEY].includes(event.key)) {
+        window.addEventListener("storage", async (event) => {
+            if ([LOCAL_FEED_KEY, PREFS_KEY].includes(event.key)) {
+                await refreshFeed();
                 renderAll();
             }
         });
     }
 
+    async function detectBackend() {
+        const [feedResponse, pushResponse] = await Promise.all([
+            requestJson("/api/notifications/feed"),
+            requestJson("/api/push/public-key")
+        ]);
+
+        state.apiAvailable = feedResponse.ok;
+        if (feedResponse.ok && Array.isArray(feedResponse.data.feed)) {
+            state.feed = feedResponse.data.feed.map(normalizeItem);
+            state.stats = feedResponse.data.stats || null;
+        } else {
+            state.feed = getLocalFeed();
+            state.stats = null;
+        }
+
+        state.pushConfigured = Boolean(pushResponse.ok && pushResponse.data.supported && pushResponse.data.publicKey);
+        state.publicKey = pushResponse.ok ? pushResponse.data.publicKey : null;
+    }
+
     async function init() {
-        seedFeedIfEmpty();
-        flushScheduledNotifications();
+        seedLocalFeedIfEmpty();
         await registerServiceWorker();
+        await detectBackend();
+        await verifyAdminSession();
+
+        if (matchesPermission() && Notification.permission === "granted") {
+            await subscribeCurrentDevice(getPrefs().topics);
+        }
+
+        state.loading = false;
         renderAll();
         attachGlobalListeners();
 
         window.setInterval(async () => {
-            const before = getPublishedNotifications()[0]?.id;
-            flushScheduledNotifications();
-            const after = getPublishedNotifications()[0]?.id;
-            if (after && after !== before) {
-                await deliverLatestNotification();
-            }
+            await refreshFeed();
             renderAll();
         }, 45000);
     }
@@ -852,9 +1114,9 @@
         savePrefs,
         publishNotification,
         deleteNotification,
-        duplicateNotification,
         showBrowserNotification,
-        requestPermission
+        requestPermission,
+        refreshFeed
     };
 
     document.addEventListener("DOMContentLoaded", init);
