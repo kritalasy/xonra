@@ -9,6 +9,7 @@
     <link rel="icon" href="images/Xonra-logo.png" sizes="any">
     <script src="animations.js" defer></script>
     <script src="scripts.js" defer></script>
+    <script src="notifications.js" defer></script>
 </head>
 <body>
     <header>
@@ -39,6 +40,7 @@
                 </div>
                 <a href="OurTeam.html" class="nav-link our-team-link">Our Team</a>
                 <a href="news.html" class="nav-link News-link">News</a>
+                <a href="admin.html" class="nav-link">Admin</a>
                 <a href="settings.html" class="nav-link settings-gear" aria-label="Settings" aria-current="page">
                     <i class="fas fa-cog"></i>
                     <span class="settings-label">Settings</span>
@@ -173,6 +175,11 @@
                     <button id="resetCustomization" style="margin-top: 16px; padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                         <i class="fas fa-undo"></i> Reset to Defaults
                     </button>
+                </div>
+
+                <div class="settings-group">
+                    <h3><i class="fas fa-bell" style="margin-right: 8px;"></i>Notifications</h3>
+                    <div data-notification-settings></div>
                 </div>
                 
                 <div class="settings-group">
