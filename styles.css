@@ -602,6 +602,10 @@ section {
     color: #ffffff;
     padding: 12px 25px;
     border-radius: 10px;
+    display: inline-block;
+    text-align: center;
+    align-self: center;
+    margin: 10px;
 }
 
 .discord-btn:hover {
