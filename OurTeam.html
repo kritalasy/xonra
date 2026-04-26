@@ -370,6 +370,106 @@
                 font-size: 1.8rem;
             }
         }
+        
+        
+        /* Specifics Section */
+        .spec-section {
+            margin-top: 80px;
+            padding-top: 60px;
+            border-top: 2px solid var(--header-border);
+        }
+
+        .spec-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .spec-title i {
+            color: var(--accent);
+        }
+
+        .spec-intro {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .spec-card {
+            background: var(--surface-bg);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid var(--header-border);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spec-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent);
+        }
+
+        .spec-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(58, 108, 244, 0.2);
+        }
+
+        .spec-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .spec-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--accent);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .spec-handle i {
+            font-size: 1.1rem;
+        }
+
+        .spec-bio {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
     </style>
 </head>
 <body>
