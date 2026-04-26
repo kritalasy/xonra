@@ -142,6 +142,135 @@
             border-radius: 100%;
             border: 2px solid var(--accent);
         }
+
+        /* GitHub Contributors Section */
+        .github-contributors-section {
+            margin-top: 80px;
+            padding-top: 60px;
+            border-top: 2px solid var(--header-border);
+        }
+
+        .github-contributors-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .github-contributors-title i {
+            color: var(--accent);
+        }
+
+        .contributors-intro {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contributors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .contributor-card {
+            background: var(--surface-bg);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid var(--header-border);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .contributor-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent);
+        }
+
+        .contributor-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(58, 108, 244, 0.2);
+        }
+
+        .contributor-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .contributor-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--accent);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .contributor-handle i {
+            font-size: 1.1rem;
+        }
+
+        .contributor-bio {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            flex-grow: 1;
+        }
+
+        .contributor-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .contributor-link:hover {
+            background: var(--accent-strong);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(58, 108, 244, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .contributors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .github-contributors-title {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -306,6 +435,52 @@
                     </div>
                 </div>
             </div>
+
+            <section class="github-contributors-section">
+                <h2 class="github-contributors-title">
+                    <i class="fab fa-github"></i> GitHub Contributors
+                </h2>
+                <p class="contributors-intro">
+                    A special thank you to our dedicated contributors who've helped shape Xonra through their code, ideas, and passion.
+                </p>
+                <div class="contributors-grid">
+                    <!-- mohamedsamir196 -->
+                    <div class="contributor-card">
+                        <img src="images/team pfp/mohamedsamirms.jpg" alt="mohamedsamir196" class="contributor-avatar">
+                        <div class="contributor-name">mohamedsamirms</div>
+                        <div class="contributor-handle">
+                         
+                        </div>
+                        
+                        <a href="https://github.com/mohamedsamirms" target="_blank" rel="noopener noreferrer" class="contributor-link">
+                            <i class="fab fa-github"></i> View Profile
+                        </a>
+                    </div>
+
+                    <!-- kritalasy -->
+                    <div class="contributor-card">
+                        <img src="images/team pfp/kritalasy.webp" alt="kritalasy" class="contributor-avatar">
+                        <div class="contributor-name">kritalasy</div>
+                        <div class="contributor-handle">
+                        </div>
+                        <a href="https://github.com/kritalasy" target="_blank" rel="noopener noreferrer" class="contributor-link">
+                            <i class="fab fa-github"></i> View Profile
+                        </a>
+                    </div>
+
+                    <!-- randomgithubaccount19837 -->
+                    <div class="contributor-card">
+                        <img src="https://avatars.githubusercontent.com/u/166883639?v=4" alt="randomgithubaccount19837" class="contributor-avatar">
+                        <div class="contributor-name">randomgithubaccount19837</div>
+                        <div class="contributor-handle">
+                           
+                        </div>
+                        <a href="https://github.com/randomgithubaccount19837" target="_blank" rel="noopener noreferrer" class="contributor-link">
+                            <i class="fab fa-github"></i> View Profile
+                        </a>
+                    </div>
+                </div>
+            </section>
 
 
 
